@@ -38,10 +38,10 @@ def check_files() -> array:
         elif not imghdr.what(arg):
             quit(print_colored_text("❌ The file '"+ arg + "' does not exists!", "RED"))
         image = Image.open(arg)
-        width, height = image.size
         parameters = sys.argv[i+2].split('.')
         if len(parameters) == 3 and int(parameters[2]) == 1:
             image = crop_image(image)
+        width, height = image.size
         filename = Path(arg).name
         data = { "filename": filename.split('.')[0],
                  "width": width,
