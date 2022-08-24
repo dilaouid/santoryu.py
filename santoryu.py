@@ -80,9 +80,10 @@ def documentation() -> None:
     print_colored_text("How to launch the script:", "YELLOW")
     print_colored_text("Ex: .\santoryu.py [filename] [parameters] [filename2] [parameters2] .......\n", "YELLOW")
     print_colored_text("Parameters works like such:", "YELLOW")
-    print_colored_text("[ SpritePerXColumn.SpritePerYRow ]", "YELLOW")
+    print_colored_text("[ SpritePerXColumn.SpritePerYRow.TrimWhiteSpace ]", "YELLOW")
     print_colored_text("For instance, if your sprite have 4 columns and 5 rows, your parameter will be 4.5", "YELLOW")
-    print_colored_text("Ex: .\santoryu.py .\sprite.png 4.5 .\sprite2.png 10.9 .\sprite3.png 4.4 ...\n", "YELLOW")
+    print_colored_text("If you want to trim the useless whitespaces around your spritesheet, you just have to add a '.1' in your parameters, or an optional '.0' if you don't want to.", "YELLOW")
+    print_colored_text("Ex: .\santoryu.py .\sprite.png 4.5 .\sprite2.png 10.9 .\sprite3.png 4.4.1 ...\n", "YELLOW")
     print_colored_text("A folder named 'santoryupy' will be created with all your spliced sprites inside.", "GREEN")
 
 def main() -> int:
