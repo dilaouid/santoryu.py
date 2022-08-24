@@ -3,7 +3,7 @@ import os
 from os.path import exists
 from pathlib import Path
 from array import array
-from PIL import Image
+from PIL import Image, ImageChops
 
 import imghdr
 
@@ -17,8 +17,16 @@ def check_arguments() -> None:
     for i, arg in enumerate(sys.argv[1:], start=0):
         if (i % 2):
             split = arg.split('.')
-            if not len(split) == 2 or not split[0].isnumeric() or not split[1].isnumeric():
-                quit(print_colored_text("❌ '" + arg + "' is not a valid parameter! Example of a valid parameter: 10.5", "RED"))
+            if not len(split) in range(2,4) or not split[0].isnumeric() or not split[1].isnumeric() or (len(split) == 3 and int(split[2]) not in range(0,2)):
+                quit(print_colored_text("❌ '" + arg + "' is not a valid parameter! Example of a valid parameter: 10.5.0", "RED"))
+
+def crop_image(image) -> Image:
+    bg = Image.new(image.mode, image.size, image.getpixel((0,0)))
+    diff = ImageChops.difference(image, bg)
+    diff = ImageChops.add(diff, diff, 2.0, -100)
+    bbox = diff.getbbox()
+    if bbox:
+        return image.crop(bbox)
 
 def check_files() -> array:
     filesInfo = []
@@ -31,8 +39,10 @@ def check_files() -> array:
             quit(print_colored_text("❌ The file '"+ arg + "' does not exists!", "RED"))
         image = Image.open(arg)
         width, height = image.size
-        filename = Path(arg).name
         parameters = sys.argv[i+2].split('.')
+        if len(parameters) == 3 and int(parameters[2]) == 1:
+            image = crop_image(image)
+        filename = Path(arg).name
         data = { "filename": filename.split('.')[0],
                  "width": width,
                  "height": height,
