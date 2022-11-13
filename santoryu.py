@@ -1,6 +1,7 @@
 import sys
 import os
-from os.path import exists
+from os import listdir
+from os.path import exists, isfile, join, isdir
 from pathlib import Path
 from array import array
 from PIL import Image, ImageChops
@@ -28,9 +29,20 @@ def crop_image(image) -> Image:
     if bbox:
         return image.crop(bbox)
 
-def check_files() -> array:
+def check_directories() -> array:
+    arg = []
+    for i, ar in enumerate(sys.argv[1:], start=0):
+        if isdir(ar) and not i % 2:
+            files_inside = (","+sys.argv[i+2]+",").join([ar + f for f in listdir(ar) if isfile(join(ar, f))]).split(",")
+            for e in files_inside:
+                arg.append(e)
+        else:
+            arg.append(ar)
+    return arg
+
+def check_files(files) -> array:
     filesInfo = []
-    for i, arg in enumerate(sys.argv[1:], start=0):
+    for i, arg in enumerate(files, start=0):
         if i % 2:
             continue
         if not exists(arg):
@@ -38,17 +50,17 @@ def check_files() -> array:
         elif not imghdr.what(arg):
             quit(print_colored_text("❌ The file '"+ arg + "' does not exists!", "RED"))
         image = Image.open(arg)
-        parameters = sys.argv[i+2].split('.')
+        parameters = files[i+1].split('.')
         if len(parameters) == 3 and int(parameters[2]) == 1:
             image = crop_image(image)
         width, height = image.size
         filename = Path(arg).name
         data = { "filename": filename.split('.')[0],
-                 "width": width,
-                 "height": height,
-                 "type": imghdr.what(arg),
-                 "image": image,
-                 "parameters": [int(el) for el in parameters] }
+                "width": width,
+                "height": height,
+                "type": imghdr.what(arg),
+                "image": image,
+                "parameters": [int(el) for el in parameters] }
         filesInfo.append(data)
     return filesInfo
 
@@ -92,7 +104,8 @@ def main() -> int:
     if (sys.argv[1] == "--help"):
         quit(documentation())
     check_arguments()
-    files = check_files()
+    arg = check_directories()
+    files = check_files(arg)
     create_image(files)
     return 0
 
